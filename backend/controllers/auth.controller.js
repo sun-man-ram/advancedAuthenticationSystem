@@ -3,6 +3,7 @@ import bcryptjs from "bcryptjs";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 // import { generateVerificationCode } from "../utils/generateVerificationCode.js";
 import { sendVerificationEmail} from "../resend/email.js";
+import { sendWelcomeEmail } from "../resend/email.js";
 export const signup= async(req,res)=>{
 const {email,password,name}=req.body;
 
@@ -49,4 +50,29 @@ export const login =async(req,res)=>{
 }
 export const logout=async(req,res)=>{
     res.send("logout route");
+}
+
+export const verifyEmail=async(req,res)=>{
+    const {code}=req.body;
+    try {
+        const user=await User.findOne({
+            verificationToken: code,
+            verificationTokenExpiresAt: {$gt:Date.now()},
+
+        })
+
+        if(!user){
+            return res.status(400).json({success: false,message:"Invalid or expired verification code "});
+        }
+        user.isVerified=true;
+        user.verificationToken=undefined;
+        user.verificationTokenExpiresAt=undefined;
+        await user.save();
+        await sendWelcomeEmail(user.email,user.name);
+        res.status(200).json({success:true,message:"Email verified successfully"});
+    } catch (error) {
+        console.log("Erro verifying email",error);
+        res.status(400).json({success:false,message:error.message});
+    }
+
 }

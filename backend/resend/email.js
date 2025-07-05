@@ -1,5 +1,5 @@
 import {resend} from "./config.js"
-
+import { verificationTokenEmailTemplate, WELCOME_EMAIL_TEMPLATE } from "./email-template.js";
 
 export const sendVerificationEmail=async (email,verificationToken)=>{
 
@@ -10,7 +10,7 @@ try {
     from: "Acme <onboarding@resend.dev>",
     to: [email],
     subject: "hello world",
-    html: `Verify your email address with this token ${verificationToken}`,
+    html: verificationTokenEmailTemplate.replace("{verificationToken}",verificationToken),
   });
 
 } catch (error) {
@@ -21,4 +21,19 @@ try {
 }
 
  
+}
+
+
+export  const sendWelcomeEmail=async(email,name)=>{
+  try {
+
+     const { data, error } = await resend.emails.send({
+    from: "Acme <onboarding@resend.dev>",
+    to: [email],
+    subject: "Welcome to our company",
+    html: WELCOME_EMAIL_TEMPLATE.replace("{name}",name)});
+    
+  } catch (error) {
+    
+  }
 }
