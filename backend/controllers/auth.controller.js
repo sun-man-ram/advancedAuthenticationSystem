@@ -2,6 +2,7 @@ import {User} from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 // import { generateVerificationCode } from "../utils/generateVerificationCode.js";
+import { sendVerificationEmail} from "../resend/email.js";
 export const signup= async(req,res)=>{
 const {email,password,name}=req.body;
 
@@ -24,6 +25,8 @@ const {email,password,name}=req.body;
             verificationTokenExpiresAt:Date.now() +24*60*60*1000
         })
         await user.save();
+
+        await sendVerificationEmail(user.email,verificationToken);
 
         //jwt token need to be created
         generateTokenAndSetCookie(res,user._id);
