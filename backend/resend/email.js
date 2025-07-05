@@ -37,3 +37,30 @@ export  const sendWelcomeEmail=async(email,name)=>{
     
   }
 }
+
+export const sendPasswordResetEmail=async(email,resetURL)=>{
+  try {
+ const { data, error } = await resend.emails.send({
+    from: "Acme <onboarding@resend.dev>",
+    to: [email],
+    subject: "Welcome to our company",
+    html: `Click <a href= "${resetURL}">here </a> to reset your password`,});
+  } catch (error) {
+    console.log("error sending welcome email",error);
+  }
+}
+
+
+export const sendResetSuccessEmail=async(email)=>{
+   try {
+ const { data, error } = await resend.emails.send({
+    from: "Acme <onboarding@resend.dev>",
+    to: [email],
+    subject: "password reset was successful",
+    html: `your password was reset successfuly`,
+  } );
+}
+  catch (error) {
+    console.log("error sending reset password",error);
+  }
+}
